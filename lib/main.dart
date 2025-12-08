@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:fnv/Screens/signin_screens.dart';
-import 'package:fnv/widget/profile_info_item.dart';
+import 'package:fnv/Screens/profile_screen.dart';
+import 'package:fnv/Screens/signin_screen.dart';
+import 'package:fnv/widgets/profile_info_item.dart';
 
 void main() {
   runApp(const MyApp());
@@ -32,7 +33,7 @@ class MyApp extends StatelessWidget {
         // tested with just a hot reload.
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: Profi(), 
+      home: ProfileScreen(), 
     );
   }
 }

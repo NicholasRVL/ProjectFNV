@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:projectFNV/Screens/signin_screen.dart';
-import 'package:wisatacandi/widgets/profile_info_item.dart';
+import 'package:fnv/Screens/signin_screen.dart';
+import 'package:fnv/widgets/profile_info_item.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
