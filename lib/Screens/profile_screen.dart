@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:fnv/Screens/signin_screen.dart';
-import 'package:fnv/widgets/profile_info_item.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -9,111 +7,192 @@ class ProfileScreen extends StatefulWidget {
   State<ProfileScreen> createState() => _ProfileScreenState();
 }
 
-class _ProfileScreenState extends State<ProfileScreen> {
-  // TODO: 1 Deklarasikan variabel yang dibutuhkan
-  bool isSignedIn = false;
-  String fullName = '';
-  String username = '';
-  int favoriteCandiCount = 0;
+class SettingItem {
+  final String label;
+  final VoidCallback action;
 
-  // TODO: 5. Implementasi fungsi Sign In
-  void signIn() {
-    setState(() {
-      Navigator.pushNamed(context, '/signin');
-    });
+  SettingItem({required this.label, required this.action});
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  void _showAlert(String message) {
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
-  // TODO: 6. Implementasi fungsi Sign Out
-  void signOut() {
-    setState(() {
-      isSignedIn = !isSignedIn;
-    });
+
+  void _editProfile() {
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Edit Profile clicked')));
   }
 
   @override
   Widget build(BuildContext context) {
+    final settingsItems = [
+      SettingItem(
+        label: 'Change Password',
+        action: () => _showAlert('Change Password'),
+      ),
+      SettingItem(
+        label: 'Theme Preference',
+        action: () => _showAlert('Theme Preference'),
+      ),
+      SettingItem(
+        label: 'Notifications',
+        action: () => _showAlert('Notifications'),
+      ),
+      SettingItem(
+        label: 'About Developer',
+        action: () => _showAlert('About Developer'),
+      ),
+    ];
+
     return Scaffold(
-      body: Stack(
-        children: [
-          Container(
-            height: 200, width: double.infinity, color: Colors.deepPurple,
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Column(
-              children: [
-                // TODO: 2 Buat bagian ProfileHeader yang berisi gambar profil
-                Align(
-                  alignment:AlignmentGeometry.topCenter,
-                  child: Padding(
-                    padding: const EdgeInsets.only(top: 200-50),
-                    child: Stack(
-                      alignment: Alignment.bottomRight,
-                      children: [
-                        Container(
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.deepPurple, width: 2),
-                            shape: BoxShape.circle,
+      appBar: AppBar(
+        title: const Text('Profile'),
+        backgroundColor: Colors.white,
+        elevation: 1,
+      ),
+      backgroundColor: const Color(0xFFF9EFD7),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+          child: Column(
+            children: [
+              // Profile Section
+              Center(
+                child: Column(
+                  children: [
+                    // Avatar
+                    Container(
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Colors.white, width: 4),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 8,
+                            spreadRadius: 1,
                           ),
-                          child: CircleAvatar(
-                            radius: 50,
-                            backgroundImage: AssetImage('images/placeholder_image.png'),
+                        ],
+                      ),
+                      child: CircleAvatar(
+                        radius: 56,
+                        backgroundColor: const Color(0xFF1B2430),
+                        child: const Text(
+                          'N',
+                          style: TextStyle(
+                            fontSize: 40,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
                           ),
                         ),
-                        if(isSignedIn)
-                          IconButton(
-                            onPressed: (){},
-                            icon: Icon(Icons.camera_alt, color: Colors.deepPurple[50],),),
-                      ],
+                      ),
                     ),
+                    const SizedBox(height: 16),
+
+                    // Name and Email
+                    const Text(
+                      'Nicholas',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF111111),
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    const Text(
+                      'nicholas@email.com',
+                      style: TextStyle(fontSize: 14, color: Color(0xFF1B2430)),
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Edit Profile Button
+                    ElevatedButton(
+                      onPressed: _editProfile,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF1B2430),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 24,
+                          vertical: 12,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: const Text(
+                        'Edit Profile',
+                        style: TextStyle(color: Colors.white, fontSize: 16),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 32),
+
+              // Settings List
+              ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.05),
+                        blurRadius: 4,
+                        spreadRadius: 0,
+                      ),
+                    ],
+                  ),
+                  child: ListView.separated(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: settingsItems.length,
+                    separatorBuilder: (context, index) => Divider(
+                      height: 1,
+                      color: Colors.grey[300],
+                      indent: 16,
+                      endIndent: 16,
+                    ),
+                    itemBuilder: (context, index) {
+                      final item = settingsItems[index];
+                      return Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          onTap: item.action,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 16,
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  item.label,
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    color: Color(0xFF111111),
+                                  ),
+                                ),
+                                Icon(
+                                  Icons.chevron_right,
+                                  color: Colors.grey[600],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
+                    },
                   ),
                 ),
-                // TODO: 3 Buat bagian ProfileInfo yang berisi info profil
-                SizedBox(height: 20),
-                Divider(color: Colors.deepPurple[100]),
-                SizedBox(height: 4),
-                ProfileInfoItem(
-                  icon: Icons.lock, 
-                  label: 'Pengguna', 
-                  value: username, 
-                  iconColor: Colors.amber,
-                ),
-                SizedBox(height: 4),
-                Divider(color: Colors.deepPurple[100]),
-                SizedBox(height: 4),
-                ProfileInfoItem(
-                  icon: Icons.person, 
-                  label: 'Nama', 
-                  value: fullName,
-                  showEditIcon: isSignedIn,
-                  onEditPressed: () {
-                    // Tindakan saat ikon edit ditekan, misalnya: pengeditan nama
-                    debugPrint('Icon edit ditekan ...');
-                    }, 
-                  iconColor: Colors.blue
-                ),
-                SizedBox(height: 4),
-                Divider(color: Colors.deepPurple[100]),
-                SizedBox(height: 4),
-                ProfileInfoItem(
-                  icon: Icons.favorite, 
-                  label: 'Favorit', 
-                  value: favoriteCandiCount > 0 ? '$favoriteCandiCount' : '', 
-                  iconColor: Colors.red
-                ),
-                // TODO: 4 Buat ProfileActions yang berisi TextButton sign in/sign out
-                SizedBox(height: 4),
-                Divider(color: Colors.deepPurple[100]),
-                SizedBox(height: 20),
-                isSignedIn ? TextButton(
-                  onPressed: signOut,
-                  child: Text('Sign Out'))
-                  :TextButton(
-                    onPressed: signIn, 
-                    child: Text('Sign In')),
-              ],
-            ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

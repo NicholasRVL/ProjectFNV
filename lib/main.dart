@@ -4,6 +4,7 @@ import 'package:fnv/Screens/profile_screen.dart';
 import 'package:fnv/Screens/favorite_screen.dart';
 import 'package:fnv/Screens/search_screen.dart';
 import 'package:fnv/Screens/signin_screen.dart';
+import 'package:fnv/Screens/support_screens.dart';
 
 void main() {
   runApp(const MyApp());
@@ -40,6 +41,7 @@ class _MainScreenState extends State<MainScreen> {
     const SearchScreen(),
     const FavoriteScreen(),
     const ProfileScreen(),
+    const SupportScreen(),
   ];
 
   void _onItemTapped(int index) {
@@ -72,6 +74,10 @@ class _MainScreenState extends State<MainScreen> {
           BottomNavigationBarItem(
             icon: Icon(Icons.person),
             label: 'Profile',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.question_answer),
+            label: 'Support',
           ),
         ],
       ),
