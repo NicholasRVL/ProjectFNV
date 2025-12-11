@@ -74,7 +74,7 @@ class _RegistrasiScreenState extends State<RegistrasiScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Sign Up')),
+      appBar: AppBar(title: Text('Registrasi')),
       // TODO: 3. Pasang Body
       body: Center(
         child: SingleChildScrollView(
