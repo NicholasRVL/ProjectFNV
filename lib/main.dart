@@ -4,6 +4,7 @@ import 'package:fnv/Screens/profile_screen.dart';
 import 'package:fnv/Screens/favorite_screen.dart';
 import 'package:fnv/Screens/search_screen.dart';
 import 'package:fnv/Screens/signin_screen.dart';
+import 'package:fnv/Screens/Intro_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -20,7 +21,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
         useMaterial3: true,
       ),
-      home: const MainScreen(),
+      home: IntroPage(),
     );
   }
 }
