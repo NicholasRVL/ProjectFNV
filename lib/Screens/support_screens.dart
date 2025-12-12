@@ -61,7 +61,6 @@ class _SupportScreenState extends State<SupportScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Header Section
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -84,8 +83,6 @@ class _SupportScreenState extends State<SupportScreen> {
                 ],
               ),
               const SizedBox(height: 24),
-
-              // Contact Options
               Column(
                 children: contactOptions
                     .map(
@@ -156,8 +153,6 @@ class _SupportScreenState extends State<SupportScreen> {
                     .toList(),
               ),
               const SizedBox(height: 32),
-
-              // FAQ Section
               Container(
                 decoration: BoxDecoration(
                   color: Colors.white,

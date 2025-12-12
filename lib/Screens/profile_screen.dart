@@ -60,11 +60,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
           child: Column(
             children: [
-              // Profile Section
               Center(
                 child: Column(
                   children: [
-                    // Avatar
                     Container(
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
@@ -91,8 +89,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                     ),
                     const SizedBox(height: 16),
-
-                    // Name and Email
                     const Text(
                       'Nicholas',
                       style: TextStyle(
@@ -107,8 +103,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       style: TextStyle(fontSize: 14, color: Color(0xFF1B2430)),
                     ),
                     const SizedBox(height: 16),
-
-                    // Edit Profile Button
                     ElevatedButton(
                       onPressed: _editProfile,
                       style: ElevatedButton.styleFrom(
@@ -130,8 +124,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
               ),
               const SizedBox(height: 32),
-
-              // Settings List
               ClipRRect(
                 borderRadius: BorderRadius.circular(12),
                 child: Container(

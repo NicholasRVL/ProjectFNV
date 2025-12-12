@@ -12,7 +12,6 @@ class _SearchScreenState extends State<SearchScreen> {
   List<String> _filteredRecipes = [];
   String _searchQuery = '';
 
-  // Sample recipes for demonstration
   final List<String> _allRecipes = [
     'Onigiri Salmon',
     'Onigiri Tuna Mayonnaise',
@@ -57,7 +56,6 @@ class _SearchScreenState extends State<SearchScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
           child: Column(
             children: [
-              // Search Input
               Container(
                 decoration: BoxDecoration(
                   color: Colors.white,
@@ -91,8 +89,6 @@ class _SearchScreenState extends State<SearchScreen> {
                 ),
               ),
               const SizedBox(height: 32),
-
-              // Empty State or Search Results
               if (_searchQuery.isEmpty)
                 Center(
                   child: Column(
