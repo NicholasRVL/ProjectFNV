@@ -1,5 +1,8 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+
 
 class SignUpScreen extends StatefulWidget {
   SignUpScreen({super.key});
@@ -17,6 +20,52 @@ class _SignUpScreenState extends State<SignUpScreen> {
   String _errorText = '';
   bool _isSignedUp = false;
   bool _obscurePassword = true;
+
+  Future<void> submitRegister() async {
+  final url = Uri.parse("https://food-api-omega-eight.vercel.app/api/api/auth/register");
+
+  final body = {
+    "name": _fullnameController.text.trim(),
+    "email": _usernameController.text.trim(),
+    "password": _passwordController.text.trim(),
+    "password_confirmation": _passwordController.text.trim(), 
+  };
+
+  try {
+    final res = await http.post(
+      url,
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode(body),
+    );
+
+    if (res.statusCode == 200) {
+      print("RAW RESPONSE = ${res.body}");
+      final data = jsonDecode(res.body);
+
+      setState(() {
+        _isSignedUp = true;
+        _errorText = '';
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Register success!")),
+      );
+
+    } else {
+      print("RAW RESPONSE = ${res.body}");
+      final data = jsonDecode(res.body);
+
+      setState(() {
+        _errorText = data["message"] ?? "Register failed";
+      });
+    }
+  } catch (e) {
+    setState(() {
+      _errorText = "Error: $e";
+    });
+    }
+  }
+
 
   @override
 
@@ -47,10 +96,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   TextFormField(
                     controller: _usernameController,
                     decoration: InputDecoration(
-                      labelText: "Nama Pengguna",
+                      labelText: "Email",
                       border: OutlineInputBorder()
                     ),
                   ),
+
                   // TODO: 6. Pasang TextFormField Kata Sandi
                   SizedBox(height: 20),
                   TextFormField(
@@ -76,7 +126,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   // TODO: 7. Pasang ElevatedButton Sign In
                   SizedBox(height: 20),
                   ElevatedButton(
-                    onPressed: (){}, 
+                    onPressed: submitRegister, 
                     child: Text('Sign Up'),
                   ),
                   // TODO: 8. Pasang TextButton Sign Up

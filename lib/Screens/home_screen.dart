@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:wisatacandi/data/candi_data.dart';
-import 'package:wisatacandi/models/candi.dart';
+import 'package:fnv/config/api_config.dart';
+import 'package:fnv/model/api_resep_makanan.dart';
 
-import '../widgets/item_card.dart';
+import '../widgets/card_resep.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});

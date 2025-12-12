@@ -1,5 +1,8 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+
 
 class SignInScreen extends StatefulWidget {
   SignInScreen({super.key});
@@ -16,6 +19,42 @@ class _SignInScreenState extends State<SignInScreen> {
   String _errorText = '';
   bool _isSignedIn = false;
   bool _obscurePassword = true;
+
+  Future<void> signIn() async {
+  final url = Uri.parse("https://food-api-omega-eight.vercel.app/api/api/auth/login");
+
+  final response = await http.post(
+    url,
+    headers: {
+      "Accept": "application/json",
+    },
+    body: {
+      "email": _usernameController.text,
+      "password": _passwordController.text,
+    },
+  );
+
+  print("RAW RESPONSE = ${response.body}");
+
+  if (response.statusCode == 200) {
+    final data = jsonDecode(response.body);
+
+    setState(() {
+      _isSignedIn = true;
+      _errorText = '';
+    });
+
+    // TODO: Navigate ke halaman setelah login
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Berhasil login")),
+    );
+  } else {
+    setState(() {
+      _errorText = "Email atau password salah";
+    });
+    }
+  }
+
 
   @override
 
@@ -67,7 +106,7 @@ class _SignInScreenState extends State<SignInScreen> {
                   // TODO: 7. Pasang ElevatedButton Sign In
                   SizedBox(height: 20),
                   ElevatedButton(
-                    onPressed: (){}, 
+                    onPressed: signIn, 
                     child: Text('Sign In'),
                   ),
                   // TODO: 8. Pasang TextButton Sign Up
