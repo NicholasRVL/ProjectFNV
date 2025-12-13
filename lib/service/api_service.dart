@@ -9,9 +9,13 @@ class ApiService {
     final res = await http.get(url);
 
     if (res.statusCode == 200) {
+
       List data = jsonDecode(res.body);
+
       return data.map((e) => ModelResep.fromJson(e)).toList();
+
     } else {
+      
       throw Exception("Gagal mengambil data");
     }
   }

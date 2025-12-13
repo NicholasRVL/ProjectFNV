@@ -3,98 +3,107 @@ import 'package:fnv/model/api_resep_makanan.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-class CardResep extends StatefulWidget {
-  const CardResep({super.key});
 
-  @override
-  State<CardResep> createState() => _CardResepState();
-}
+class CardResep extends StatelessWidget {
+  final ModelResep resep;
+  
 
-class _CardResepState extends State<CardResep> {
-  String result = "Belum ada data";
-  List<ModelResep> Resep = [];
-
-  Future<void> testGetApi() async {
-    final url = Uri.parse(
-      "https://food-api-omega-eight.vercel.app/api/api/recipes",
-    );
-
-    try {
-      final response = await http.get(url);
-
-      if (response.statusCode == 200) {
-        final json = jsonDecode(response.body);
-
-        final List data = json['data'];
-
-
-        setState(() {
-          Resep = data.map((json) => ModelResep.fromJson(json)).toList();
-          result = "${Resep.length}";
-        });
-      } else {
-        setState(() {
-          result = "Error: ${response.statusCode}";
-        });
-      }
-    } catch (e) {
-      setState(() {
-        result = "Exception: $e";
-      });
-    }
-  }
+  const CardResep({super.key, required this.resep});
+  
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text('Test API')),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Text(result, style: TextStyle(fontSize: 16)),
-          ),
-          Expanded(
-            child: Resep.isEmpty
-                ? Center(
-                    child: Text(
-                      'Tidak ada data',
-                      style: TextStyle(fontSize: 18),
-                    ),
-                  )
-                : ListView.builder(
-                    itemCount: Resep.length,
-                    itemBuilder: (context, index) {
-                      final resep = Resep[index];
-                      return Card(
-                        margin: EdgeInsets.all(8),
-                        child: ListTile(
-                          title: Text(resep.title ?? 'No Title'),
-                          subtitle: Text(resep.description ?? 'No Description'),
-                          leading:
-                              resep.coverImage != null &&
-                                  resep.coverImage!.isNotEmpty
-                              ? Image.network(
-                                  resep.coverImage!,
-                                  width: 50,
-                                  height: 50,
-                                  fit: BoxFit.cover,
-                                )
-                              : Icon(Icons.fastfood),
-                          trailing: Text(
-                            '${resep.ingredients?.length ?? 0} bahan',
-                          ),
+      print('COVER IMAGE RAW: ${resep.coverImage}');
+
+        
+    return InkWell(
+      onTap: () {
+        // Navigator.push(
+        //   context,
+        //   MaterialPageRoute(
+        //     builder: (context) => DetailScreen(resep: resep),
+        //   ),
+        // );
+      },
+      child: Card(
+
+        shape: RoundedRectangleBorder(
+
+          borderRadius: BorderRadius.circular(15),
+
+        ),
+
+
+        margin: const EdgeInsets.all(4),
+        elevation: 2,
+
+        child: Column(
+
+          crossAxisAlignment: CrossAxisAlignment.start,
+
+          children: [
+
+            Expanded(
+
+              child: ClipRRect(
+
+                borderRadius: const BorderRadius.vertical(
+
+                  top: Radius.circular(15),
+
+                ),
+
+                child: resep.coverImage != null &&
+                
+                        resep.coverImage!.isNotEmpty
+                    ? Image.network(
+                        resep.coverImage!,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                      )
+                    : Container(
+                        color: Colors.grey[300],
+                        child: const Icon(
+                          Icons.fastfood,
+                          size: 50,
                         ),
-                      );
-                    },
-                  ),
-          ),
-        ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: testGetApi,
-        child: Icon(Icons.refresh),
+                        
+                      ),
+              ),
+            ),
+
+
+            Padding(
+              padding: const EdgeInsets.only(left: 12, top: 8),
+              child: Text(
+                resep.title ?? 'No Title',
+
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+
+            Padding(
+              padding: const EdgeInsets.only(left: 12, bottom: 8),
+              child: Text(
+
+                '${resep.ingredients?.length ?? 0} bahan',
+                style: const TextStyle(fontSize: 12),
+
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
+
 }
+
+
+   
+

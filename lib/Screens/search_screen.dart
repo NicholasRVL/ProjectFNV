@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:wisatacandi/models/candi.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
@@ -9,91 +8,155 @@ class SearchScreen extends StatefulWidget {
 }
 
 class _SearchScreenState extends State<SearchScreen> {
-  // TODO: 1. Deklarasikan variabel yang dibutuhkan
-  List<Candi> _filteredCandis = [];
-  String _searchQuery = '';
   final TextEditingController _searchController = TextEditingController();
+  List<String> _filteredRecipes = [];
+  String _searchQuery = '';
+
+  final List<String> _allRecipes = [
+    'Onigiri Salmon',
+    'Onigiri Tuna Mayonnaise',
+    'Onigiri Umeboshi',
+    'Onigiri Katsuobushi',
+    'Onigiri Kelp',
+    'Onigiri Mixed Vegetables',
+  ];
+
+  void _performSearch(String query) {
+    setState(() {
+      _searchQuery = query;
+      if (query.isEmpty) {
+        _filteredRecipes = [];
+      } else {
+        _filteredRecipes = _allRecipes
+            .where(
+              (recipe) => recipe.toLowerCase().contains(query.toLowerCase()),
+            )
+            .toList();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // TODO: 2. Buat appbar dengan judul Pencarian Candi
       appBar: AppBar(
-        title: const Text('Pencarian Candi'),
+        title: const Text('Search'),
+        backgroundColor: Colors.white,
+        elevation: 1,
       ),
-      // TODO: 3. Buat body berupa Column
-      body: Column(
-        children: [
-          // TODO: 4. Buat TextField pencarian sebagai anak dari Column
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Container(
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(5),
-                  color: Colors.deepPurple[50]),
-              child: const TextField(
-                autofocus: false,
-                // TODO: 6. Implementasi fitur pencarian
-                decoration: InputDecoration(
-                  hintText: 'Cari candi ...',
-                  prefixIcon: Icon(Icons.search),
-                // Todo: 7. Implementasi pengosongan input
-                  border: InputBorder.none,
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.deepPurple),
+      backgroundColor: const Color(0xFFF9EFD7),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+          child: Column(
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 4,
+                      spreadRadius: 0,
+                    ),
+                  ],
+                ),
+                child: TextField(
+                  controller: _searchController,
+                  onChanged: _performSearch,
+                  decoration: InputDecoration(
+                    hintText: 'Search recipes...',
+                    hintStyle: TextStyle(
+                      color: const Color(0xFF1B2430).withOpacity(0.5),
+                    ),
+                    border: InputBorder.none,
+                    prefixIcon: Icon(
+                      Icons.search,
+                      color: const Color(0xFF1B2430).withOpacity(0.5),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
                   ),
-                  contentPadding:
-                      EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 ),
               ),
-            ),
-          ),
-          // TODO: 5. Buat ListView hasil pencarian sebagai anak dari Column
-          Expanded(
-            child: ListView.builder(
-                itemCount: _filteredCandis.length,
-                itemBuilder: (context, index) {
-                  final candi = _filteredCandis[index];
-                  return Card(
-                    margin:
-                        const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(8),
-                          width: 100,
-                          height: 100,
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(10),
-                            child: Image.asset(
-                              candi.imageAsset,
-                              fit: BoxFit.cover,
+              const SizedBox(height: 32),
+              if (_searchQuery.isEmpty)
+                Center(
+                  child: Column(
+                    children: [
+                      Container(
+                        width: 80,
+                        height: 80,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.05),
+                              blurRadius: 4,
+                              spreadRadius: 0,
                             ),
-                          ),
+                          ],
                         ),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                candi.name,
-                                style: const TextStyle(
-                                    fontSize: 16, fontWeight: FontWeight.bold),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(candi.location),
-                            ],
-                          ),
+                        child: Icon(
+                          Icons.search,
+                          size: 40,
+                          color: const Color(0xFF1B2430).withOpacity(0.3),
                         ),
-                      ],
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'Search for your favorite recipes',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: const Color(0xFF1B2430).withOpacity(0.7),
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+              else if (_filteredRecipes.isEmpty)
+                Center(
+                  child: Text(
+                    'No recipes found',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: const Color(0xFF1B2430).withOpacity(0.7),
                     ),
-                  );
-                }),
+                  ),
+                )
+              else
+                ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: _filteredRecipes.length,
+                  itemBuilder: (context, index) {
+                    final recipe = _filteredRecipes[index];
+                    return Card(
+                      margin: const EdgeInsets.only(bottom: 12),
+                      child: ListTile(
+                        title: Text(recipe),
+                        leading: Icon(
+                          Icons.restaurant,
+                          color: const Color(0xFF1B2430),
+                        ),
+                        trailing: const Icon(Icons.chevron_right),
+                      ),
+                    );
+                  },
+                ),
+            ],
           ),
-          const SizedBox(height: 16)
-        ],
+        ),
       ),
     );
   }
