@@ -63,12 +63,19 @@ class _HomeScreenState extends State<HomeScreen> {
 
   List<ModelResep> get filteredRecipes {
     return listResep.where((recipe) {
-      final matchesSearch =
-          recipe.title ?.toLowerCase().contains(searchQuery.toLowerCase()) ??
-          false;
+    final title = recipe.title?.toLowerCase() ?? '';
 
+      final matchesSearch =
+        title.contains(searchQuery.toLowerCase());
+
+      // ⬇️ AMAN: kalau category null, anggap lolos filter
       final matchesCategory =
-          selectedCategory == 'All' || recipe.category ?.name == selectedCategory;
+        selectedCategory == 'All' ||
+        recipe.category == null ||
+        recipe.category!.name
+                ?.toLowerCase() ==
+            selectedCategory.toLowerCase();
+
       return matchesSearch && matchesCategory;
     }).toList();
   }
