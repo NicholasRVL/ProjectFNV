@@ -39,14 +39,19 @@ class _HomeScreenState extends State<HomeScreen> {
 
         setState(() {
           listResep = data.map((e) => ModelResep.fromJson(e)).toList();
-
           isLoading = false;
         });
       } else {
-        isLoading = false;
+        setState((){
+           isLoading = false;
+        });
       }
     } catch (e) {
-      isLoading = false;
+      setState(() {
+        isLoading = false;
+      });
+
+      debugPrint("ERROR FETCH: $e");
     }
   }
 
