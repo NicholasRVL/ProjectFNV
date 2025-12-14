@@ -1,4 +1,14 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
+import 'package:fnv/Screens/signin_screen.dart';
+import 'package:fnv/config/api_config.dart';
+import 'package:fnv/model/api_resep_makanan.dart';
+import 'package:fnv/widgets/card_resep.dart';
+import 'package:fnv/service/auth_service.dart';
+import 'package:fnv/Screens/profile_screen.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -7,37 +17,53 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class Recipe {
-  final int id;
-  final String title;
-  final String category;
-
-  Recipe({required this.id, required this.title, required this.category});
-}
-
 class _HomeScreenState extends State<HomeScreen> {
+  List<ModelResep> listResep = [];
+  bool isLoading = true;
   String searchQuery = '';
   bool isFilterOpen = false;
   String selectedCategory = 'All';
   String selectedSort = 'popular';
 
-  // Sample recipes data
-  final List<Recipe> recipes = [
-    Recipe(id: 1, title: 'Salmon Onigiri', category: 'Fish'),
-    Recipe(id: 2, title: 'Tuna Mayo Onigiri', category: 'Fish'),
-    Recipe(id: 3, title: 'Umeboshi Onigiri', category: 'Vegetable'),
-    Recipe(id: 4, title: 'Kelp Onigiri', category: 'Vegetable'),
-    Recipe(id: 5, title: 'Mixed Vegetables', category: 'Vegetable'),
-    Recipe(id: 6, title: 'Shrimp Tempura Onigiri', category: 'Seafood'),
-  ];
+  Future<void> fetchResep() async {
+    final url = Uri.parse(
+      "https://food-api-omega-eight.vercel.app/api/api/recipes",
+    );
 
-  List<Recipe> get filteredRecipes {
-    return recipes.where((recipe) {
-      final matchesSearch = recipe.title.toLowerCase().contains(
-        searchQuery.toLowerCase(),
-      );
+    try {
+      final response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        final json = jsonDecode(response.body);
+        final List data = json['data'];
+
+        setState(() {
+          listResep = data.map((e) => ModelResep.fromJson(e)).toList();
+
+          isLoading = false;
+        });
+      } else {
+        isLoading = false;
+      }
+    } catch (e) {
+      isLoading = false;
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    fetchResep();
+  }
+
+  List<ModelResep> get filteredRecipes {
+    return listResep.where((recipe) {
+      final matchesSearch =
+          recipe.title ?.toLowerCase().contains(searchQuery.toLowerCase()) ??
+          false;
+
       final matchesCategory =
-          selectedCategory == 'All' || recipe.category == selectedCategory;
+          selectedCategory == 'All' || recipe.category ?.name == selectedCategory;
       return matchesSearch && matchesCategory;
     }).toList();
   }
@@ -104,18 +130,90 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Onigiri Recipes'),
-        backgroundColor: Colors.white,
-        elevation: 1,
-      ),
-      backgroundColor: const Color(0xFFF9EFD7),
+      backgroundColor: const Color.fromARGB(255, 255, 255, 255),
       body: Column(
         children: [
           // Search Bar with Filter
           Container(
-            color: Colors.white,
+            
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.3),
+                  blurRadius: 8,
+                  offset: Offset(0, 3),
+                ),
+              ],
+            ),
+             
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    CircleAvatar(
+                      radius: 20,
+                      backgroundColor: const Color(0xFF1B2430).withOpacity(0.1),
+                      child: Icon(
+                        Icons.list,
+                        color: const Color(0xFF1B2430),
+                      ),
+                    ),
+
+                    Text(
+                      'Onigiri',
+                      style: const TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF1B2430),
+                      ),
+                    ),
+
+                    InkWell(
+                      borderRadius: BorderRadius.circular(20),
+                      onTap: () {
+                        if (AuthSession.isLoggedIn) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ProfileScreen(
+                                
+                                user: AuthSession.currentUser!,
+                              ),
+                            ),
+                          );
+                        } else {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => SignInScreen(),
+                            ),
+                          );
+                        }
+                      },
+                      child: CircleAvatar(
+                        radius: 20,
+                        backgroundColor: const Color(0xFF1B2430).withOpacity(0.1),
+                        child: const Icon(
+                          Icons.person,
+                          color: Color(0xFF1B2430),
+                        ),
+                      ),
+                    )
+
+                  ],
+                ),
+              ],
+            ),
+          ),
+
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 17),
+
+            
+
             child: Column(
               children: [
                 // Search and Filter Button Row
@@ -124,9 +222,17 @@ class _HomeScreenState extends State<HomeScreen> {
                     Expanded(
                       child: Container(
                         decoration: BoxDecoration(
-                          color: const Color(0xFFF9EFD7),
+                          color: const Color.fromARGB(255, 255, 255, 255),
                           borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.2),
+                              blurRadius: 8,
+                              offset: Offset(0, 3),
+                            ),
+                         ],
                         ),
+                        
                         child: TextField(
                           onChanged: (value) {
                             setState(() {
@@ -136,6 +242,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           decoration: InputDecoration(
                             hintText: 'Search recipes...',
                             border: InputBorder.none,
+                            
                             prefixIcon: Icon(
                               Icons.search,
                               color: const Color(0xFF1B2430).withOpacity(0.5),
@@ -198,10 +305,14 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
           ),
+
           // Main Content
           Expanded(
-            child: filteredRecipes.isNotEmpty
-                ? GridView.builder(
+            child: isLoading
+                ? Center(child: CircularProgressIndicator())
+                : filteredRecipes.isEmpty
+                ? Center(child: Text('No recipes found'))
+                : GridView.builder(
                     padding: const EdgeInsets.all(12),
                     gridDelegate:
                         const SliverGridDelegateWithFixedCrossAxisCount(
@@ -212,88 +323,12 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                     itemCount: filteredRecipes.length,
                     itemBuilder: (context, index) {
-                      final recipe = filteredRecipes[index];
-                      return RecipeCard(recipe: recipe);
+                      return CardResep(resep: filteredRecipes[index]);
                     },
-                  )
-                : Center(
-                    child: Text(
-                      'No recipes found',
-                      style: TextStyle(
-                        color: const Color(0xFF1B2430).withOpacity(0.7),
-                      ),
-                    ),
                   ),
           ),
+
         ],
-      ),
-    );
-  }
-}
-
-class RecipeCard extends StatelessWidget {
-  final Recipe recipe;
-
-  const RecipeCard({required this.recipe, super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('${recipe.title} selected')));
-      },
-      child: Card(
-        elevation: 2,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              height: 120,
-              decoration: BoxDecoration(
-                color: const Color(0xFF1B2430).withOpacity(0.1),
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(12),
-                  topRight: Radius.circular(12),
-                ),
-              ),
-              child: Center(
-                child: Icon(
-                  Icons.restaurant,
-                  size: 40,
-                  color: const Color(0xFF1B2430).withOpacity(0.5),
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    recipe.title,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    recipe.category,
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: const Color(0xFF1B2430).withOpacity(0.6),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }

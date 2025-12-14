@@ -5,8 +5,11 @@ import 'package:fnv/Screens/favorite_screen.dart';
 import 'package:fnv/Screens/search_screen.dart';
 import 'package:fnv/Screens/signin_screen.dart';
 import 'package:fnv/Screens/support_screens.dart';
+import 'package:fnv/service/auth_service.dart';
+import 'package:fnv/intro.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
 }
 
@@ -21,7 +24,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
         useMaterial3: true,
       ),
-      home: const MainScreen(),
+      home: const SplashScreen(),
     );
   }
 }
@@ -40,7 +43,9 @@ class _MainScreenState extends State<MainScreen> {
     const HomeScreen(),
     const SearchScreen(),
     const FavoriteScreen(),
-    const ProfileScreen(),
+    AuthSession.currentUser != null
+      ? ProfileScreen(user: AuthSession.currentUser!)
+      : SignInScreen(),
     const SupportScreen(),
   ];
 

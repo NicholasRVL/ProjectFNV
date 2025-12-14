@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:fnv/model/model_user.dart';
+import 'package:fnv/service/auth_service.dart';
+
 
 class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({super.key});
+  final UserModel user;
+
+  const ProfileScreen({super.key, required this.user});
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
@@ -13,6 +18,11 @@ class SettingItem {
 
   SettingItem({required this.label, required this.action});
 }
+
+
+
+
+
 
 class _ProfileScreenState extends State<ProfileScreen> {
   void _showAlert(String message) {
@@ -89,19 +99,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    const Text(
-                      'Nicholas',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF111111),
+                    Text(
+                        widget.user.name,
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF111111),
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 4),
-                    const Text(
-                      'nicholas@email.com',
-                      style: TextStyle(fontSize: 14, color: Color(0xFF1B2430)),
-                    ),
+                      const SizedBox(height: 4),
+                      Text(
+                        widget.user.email,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: Color(0xFF1B2430),
+                        ),
+                      ),
+
                     const SizedBox(height: 16),
                     ElevatedButton(
                       onPressed: _editProfile,
