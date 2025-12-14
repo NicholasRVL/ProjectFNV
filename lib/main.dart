@@ -1,15 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:fnv/Screens/favorite.dart';
-import 'package:fnv/Screens/home.dart';
-import 'package:fnv/Screens/login.dart';
-import 'package:fnv/Screens/profile.dart';
-import 'package:fnv/Screens/registrasi.dart';
-import 'package:fnv/Screens/search.dart';
-import 'package:fnv/data/candi_data.dart';
-import 'package:fnv/screens/detail_screen.dart';
+import 'package:fnv/Screens/detail_screen.dart';
+import 'package:fnv/model/masakan.dart';
 
-
-// test
 void main() {
   runApp(const MyApp());
 }
@@ -20,109 +12,166 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Wisata Candi',
+      debugShowCheckedModeBanner: false,
+      title: 'Aplikasi Resep Makanan',
       theme: ThemeData(
-        appBarTheme: const AppBarTheme(
-          iconTheme: IconThemeData(color: Colors.deepPurple),
-          titleTextStyle: TextStyle(
-            color: Colors.deepPurple,
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.deepPurple,
-        ).copyWith(primary: Colors.deepPurple, surface: Colors.deepPurple[50]),
-        useMaterial3: true,
+        primarySwatch: Colors.orange,
       ),
-      // home: MainScreen(),
-      home: MainScreen(),
-      initialRoute: '/',
-      routes: {
-        '/homescreen': (context) => const HomeScreen(),
-        '/signIn': (context) => LoginScreen(),
-        '/signUp': (context) => RegistrasiScreen(),
-      },
-      // home: ProfileScreen(),
-      // home: SearchScreen(),
-      // home: SignUpScreen(),
-      // home: SignInScreen(),
-      // home: DetailScreen(candi: candiList[0]),
+      home: const HomeScreen(),
     );
   }
 }
 
-class MainScreen extends StatefulWidget {
-  const MainScreen({super.key});
-  @override
-  State<StatefulWidget> createState() => _MainScreenState();
-}
-
-class _MainScreenState extends State<MainScreen> {
-  // TODO: 1. Deklarasikan Variabel
-  int _currentIndex = 0;
-  final List<Widget> _childern = [
-    HomeScreen(),
-    SearchScreen(),
-    FavoriteScreen(),
-    ProfileScreen(),
-  ];
+/// ================= HOME SCREEN =================
+class HomeScreen extends StatelessWidget {
+  const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final List<ResepMakanan> resepList = [
+      ResepMakanan(
+        id: '1',
+        nama: 'Nasi Goreng',
+        deskripsi: 'Makanan khas Indonesia yang gurih dan lezat.',
+        gambar: 'https://i.imgur.com/5Aqgz7o.jpg',
+        bahan: [
+          'Nasi putih',
+          'Telur',
+          'Bawang putih',
+          'Kecap manis',
+          'Garam',
+        ],
+        langkah: [
+          'Panaskan minyak',
+          'Tumis bawang putih',
+          'Masukkan telur',
+          'Masukkan nasi dan kecap',
+          'Aduk hingga matang',
+        ],
+        waktuMasak: '15 menit',
+        tingkatKesulitan: 'Mudah',
+        asal: 'Indonesia',
+      ),
+      ResepMakanan(
+        id: '2',
+        nama: 'Mie Goreng',
+        deskripsi: 'Mie goreng sederhana dan nikmat.',
+        gambar: 'https://i.imgur.com/9Q9ZQZz.jpg',
+        bahan: ['Mie', 'Telur', 'Bumbu mie'],
+        langkah: ['Rebus mie', 'Masak telur', 'Campur bumbu'],
+        waktuMasak: '10 menit',
+        tingkatKesulitan: 'Mudah',
+        asal: 'Indonesia',
+      ),
+    ];
+
     return Scaffold(
-      // TODO: 2. Buat properti bpody berupa widget yang ditampilkan
-      body: _childern[_currentIndex],
-      // TODO: 3. Buat properti bottomNavigationBar dengan nilai Theme
-      bottomNavigationBar: Theme(
-        // TODO: 4. Buat data dan child dari Theme
-        data: Theme.of(context).copyWith(canvasColor: Colors.deepPurple[50]),
-        child: BottomNavigationBar(
-          items: [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home, color: Colors.deepPurple),
-              label: 'Home',
+      appBar: AppBar(
+        title: const Text('Resep Makanan'),
+        centerTitle: true,
+      ),
+      body: ListView.builder(
+        padding: const EdgeInsets.all(12),
+        itemCount: resepList.length,
+        itemBuilder: (context, index) {
+          final resep = resepList[index];
+
+          return Card(
+            elevation: 4,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
             ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.search, color: Colors.deepPurple),
-              label: 'Search',
+            margin: const EdgeInsets.only(bottom: 12),
+            child: InkWell(
+              borderRadius: BorderRadius.circular(16),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        DetailScreen(masakan: resep,),
+                  ),
+                );
+              },
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+
+                  /// Gambar
+                  ClipRRect(
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(16),
+                    ),
+                    child: Image.network(
+                      resep.gambar,
+                      height: 180,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+
+                  Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+
+                        /// Nama
+                        Text(
+                          resep.nama,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+
+                        const SizedBox(height: 6),
+
+                        /// Deskripsi
+                        Text(
+                          resep.deskripsi,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(color: Colors.black54),
+                        ),
+
+                        const SizedBox(height: 10),
+
+                        /// Info Row
+                        Row(
+                          mainAxisAlignment:
+                              MainAxisAlignment.spaceBetween,
+                          children: [
+                            _infoIcon(
+                                Icons.timer, resep.waktuMasak),
+                            _infoIcon(Icons.local_fire_department,
+                                resep.tingkatKesulitan),
+                            _infoIcon(
+                                Icons.place, resep.asal),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.favorite, color: Colors.deepPurple),
-              label: 'Favorite',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.person, color: Colors.deepPurple),
-              label: 'Profile',
-            ),
-          ],
-          currentIndex: _currentIndex,
-          onTap: (index) {
-            setState(() {
-              _currentIndex = index;
-            });
-          },
-          selectedItemColor: Colors.deepPurple,
-          unselectedItemColor: Colors.deepPurple[100],
-          showSelectedLabels: true,
-        ),
+          );
+        },
       ),
     );
   }
-}
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  @override
-  Widget build(BuildContext context) {
-    return Placeholder();
+  Widget _infoIcon(IconData icon, String text) {
+    return Row(
+      children: [
+        Icon(icon, size: 16, color: Colors.orange),
+        const SizedBox(width: 4),
+        Text(
+          text,
+          style: const TextStyle(fontSize: 12),
+        ),
+      ],
+    );
   }
 }
