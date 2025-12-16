@@ -27,11 +27,13 @@ class ModelResep {
   final int? savesCount;
 
   final ModelKategori? category;
-  final List<IngredientModel> ingredients;
+  final List<ModelBahan> ingredients;
   final List<ModelAlat> tools;
   final List<StepModel> steps;
   final List<RatingModel> ratings;
   final List<ReviewModel> reviews;
+  final DateTime createdAt;
+
 
   ModelResep({
     this.id,
@@ -55,6 +57,7 @@ class ModelResep {
     this.steps = const [],
     this.ratings = const [],
     this.reviews = const [],
+    required this.createdAt,
   });
 
   factory ModelResep.fromJson(Map<String, dynamic> json) {
@@ -83,7 +86,7 @@ class ModelResep {
           : null,
 
       ingredients: (json['ingredients'] as List? ?? [])
-          .map((e) => IngredientModel.fromJson(e))
+          .map((e) => ModelBahan.fromJson(e))
           .toList(),
 
       tools: (json['tools'] as List? ?? [])
@@ -101,6 +104,7 @@ class ModelResep {
       reviews: (json['reviews'] as List? ?? [])
           .map((e) => ReviewModel.fromJson(e))
           .toList(),
+      createdAt: DateTime.parse(json['created_at'])
     );
   }
 }

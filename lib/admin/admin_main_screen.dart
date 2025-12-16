@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:fnv/Screens/home_screen.dart';
-import 'package:fnv/Screens/profile_screen.dart';
 import 'package:fnv/Screens/favorite_screen.dart';
+import 'package:fnv/admin/admin_home.dart';
+import 'package:fnv/Screens/profile_screen.dart';
+import 'package:fnv/admin/list_request.dart';
 import 'package:fnv/Screens/signin_screen.dart';
 import 'package:fnv/Screens/request_screen.dart';
 import 'package:fnv/service/auth_service.dart';
-import 'package:fnv/admin/form_resep.dart';
 import 'package:fnv/intro.dart';
 
-void main() {
+void AdminMain() {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
 }
@@ -29,32 +29,28 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class MainScreen extends StatefulWidget {
-  const MainScreen({super.key});
+class AdminMainScreen extends StatefulWidget {
+  const AdminMainScreen({super.key});
 
   @override
-  State<MainScreen> createState() => _MainScreenState();
+  State<AdminMainScreen> createState() => _AdminMainScreenState();
 }
 
-class _MainScreenState extends State<MainScreen> {
+class _AdminMainScreenState extends State<AdminMainScreen> {
   int _selectedIndex = 0;
 
   final List<Widget> _screens = [
-    
-    HomeScreen(user: AuthSession.currentUser),
+    const AdminHome(),
 
     AuthSession.currentUser != null
-      ? FavoriteScreen(user: AuthSession.currentUser!)
-      : SignInScreen(),
+        ? FavoriteScreen(user: AuthSession.currentUser!)
+        : SignInScreen(),
+
+    const ListRequestScreen(),
 
     AuthSession.currentUser != null
-      ? RequestScreen(user: AuthSession.currentUser!)
-      : SignInScreen(),
-
-    AuthSession.currentUser != null
-      ? ProfileScreen(user: AuthSession.currentUser!)
-      : SignInScreen(),
-
+        ? ProfileScreen(user: AuthSession.currentUser!)
+        : SignInScreen(),
   ];
 
   void _onItemTapped(int index) {
@@ -72,25 +68,13 @@ class _MainScreenState extends State<MainScreen> {
         onTap: _onItemTapped,
         type: BottomNavigationBarType.fixed,
         items: const [
-
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+          BottomNavigationBarItem(icon: Icon(Icons.favorite), label: 'Saved'),
           BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
+            icon: Icon(Icons.question_answer),
+            label: 'List Request',
           ),
-
-          BottomNavigationBarItem(
-            icon: Icon(Icons.favorite),
-            label: 'Saved',
-          ),
-           BottomNavigationBarItem(
-            icon: Icon(Icons.request_page),
-            label: 'Request',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profile',
-          ),
-         
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
         ],
       ),
     );

@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:fnv/Screens/home_screen.dart';
+import 'package:fnv/Screens/signin_screen.dart';
 import 'package:fnv/model/model_user.dart';
+import 'package:fnv/main.dart';
 import 'package:fnv/service/auth_service.dart';
 
 
@@ -21,9 +24,6 @@ class SettingItem {
 
 
 
-
-
-
 class _ProfileScreenState extends State<ProfileScreen> {
   void _showAlert(String message) {
     ScaffoldMessenger.of(
@@ -31,40 +31,32 @@ class _ProfileScreenState extends State<ProfileScreen> {
     ).showSnackBar(SnackBar(content: Text(message)));
   }
 
-  void _editProfile() {
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(const SnackBar(content: Text('Edit Profile clicked')));
+
+  void _handleLogout() async {
+
+    await AuthSession.logout();
+
+
+    if (mounted) {
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(
+
+          builder: (context) =>  MainScreen(), 
+        ),
+        (Route<dynamic> route) => false,
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final settingsItems = [
-      SettingItem(
-        label: 'Change Password',
-        action: () => _showAlert('Change Password'),
-      ),
-      SettingItem(
-        label: 'Theme Preference',
-        action: () => _showAlert('Theme Preference'),
-      ),
-      SettingItem(
-        label: 'Notifications',
-        action: () => _showAlert('Notifications'),
-      ),
-      SettingItem(
-        label: 'About Developer',
-        action: () => _showAlert('About Developer'),
-      ),
-    ];
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Profile'),
-        backgroundColor: Colors.white,
-        elevation: 1,
+        centerTitle: true,
       ),
-      backgroundColor: const Color(0xFFF9EFD7),
+      backgroundColor: const Color.fromARGB(255, 255, 255, 255),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
@@ -89,7 +81,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         radius: 56,
                         backgroundColor: const Color(0xFF1B2430),
                         child: const Text(
-                          'N',
+                          '?',
                           style: TextStyle(
                             fontSize: 40,
                             fontWeight: FontWeight.bold,
@@ -117,22 +109,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
 
                     const SizedBox(height: 16),
-                    ElevatedButton(
-                      onPressed: _editProfile,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF1B2430),
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 24,
-                          vertical: 12,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      child: const Text(
-                        'Edit Profile',
-                        style: TextStyle(color: Colors.white, fontSize: 16),
-                      ),
+                    IconButton(
+                      icon: const Icon(Icons.logout),
+                      onPressed: _handleLogout, 
+                      tooltip: 'Logout',
+                    
                     ),
                   ],
                 ),
@@ -151,48 +132,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         spreadRadius: 0,
                       ),
                     ],
-                  ),
-                  child: ListView.separated(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: settingsItems.length,
-                    separatorBuilder: (context, index) => Divider(
-                      height: 1,
-                      color: Colors.grey[300],
-                      indent: 16,
-                      endIndent: 16,
-                    ),
-                    itemBuilder: (context, index) {
-                      final item = settingsItems[index];
-                      return Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          onTap: item.action,
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 16,
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  item.label,
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    color: Color(0xFF111111),
-                                  ),
-                                ),
-                                Icon(
-                                  Icons.chevron_right,
-                                  color: Colors.grey[600],
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      );
-                    },
                   ),
                 ),
               ),

@@ -2,8 +2,8 @@ class StepModel {
   final int? id;
   final int? recipeId;
   final int? position;
-  final String? instruction;
-  final String? tips;
+   String? instruction;
+   String? tips;
 
   StepModel({
     this.id,

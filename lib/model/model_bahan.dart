@@ -1,11 +1,11 @@
-class IngredientModel {
+class ModelBahan {
   final int? id;
   final int? recipeId;
-  final String? name;
-  final String? quantity;
-  final String? unit;
+   String? name;
+  String? quantity;
+   String? unit;
 
-  IngredientModel({
+  ModelBahan({
     this.id,
     this.recipeId,
     this.name,
@@ -13,8 +13,8 @@ class IngredientModel {
     this.unit,
   });
 
-  factory IngredientModel.fromJson(Map<String, dynamic> json) {
-    return IngredientModel(
+  factory ModelBahan.fromJson(Map<String, dynamic> json) {
+    return ModelBahan(
       id: json['id'],
       recipeId: json['recipe_id'],
       name: json['name']?.toString(),

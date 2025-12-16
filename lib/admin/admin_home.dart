@@ -2,8 +2,12 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:fnv/Screens/signin_screen.dart';
+import 'package:fnv/admin/card_admin.dart';
+import 'package:fnv/admin/form_kategori.dart';
+import 'package:fnv/admin/form_resep.dart';
 import 'package:fnv/config/api_config.dart';
 import 'package:fnv/model/api_resep_makanan.dart';
+import 'package:fnv/model/model_kategori.dart';
 import 'package:fnv/widgets/card_resep.dart';
 import 'package:fnv/service/auth_service.dart';
 import 'package:fnv/Screens/profile_screen.dart';
@@ -11,22 +15,22 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:fnv/model/model_user.dart';
 
-class HomeScreen extends StatefulWidget {
-  final UserModel? user;
-
-  const HomeScreen({super.key, required this.user});
+class AdminHome extends StatefulWidget {
+  const AdminHome({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  State<AdminHome> createState() => _AdminHomeState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _AdminHomeState extends State<AdminHome> {
   List<ModelResep> listResep = [];
+  List<ModelKategori> listKategori = [];
   bool isLoading = true;
   String searchQuery = '';
   bool isFilterOpen = false;
   String selectedCategory = 'All';
   String selectedSort = 'popular';
+  bool _showAddOptions = false;
   List<String> categories = ['All'];
 
   Future<void> fetchResep() async {
@@ -44,15 +48,6 @@ class _HomeScreenState extends State<HomeScreen> {
         setState(() {
           listResep = data.map((e) => ModelResep.fromJson(e)).toList();
 
-          final apiCategories = listResep
-              .map((e) => e.category?.name)
-              .where((name) => name != null)
-              .cast<String>()
-              .toSet()
-              .toList();
-
-          categories = ['All', ...apiCategories];
-
           isLoading = false;
         });
       } else {
@@ -60,6 +55,58 @@ class _HomeScreenState extends State<HomeScreen> {
       }
     } catch (e) {
       isLoading = false;
+    }
+  }
+
+  Future<void> deleteRecipe(int id) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Hapus Resep'),
+        content: const Text('Yakin mau hapus resep ini?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Batal'),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Hapus'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm != true) return;
+
+    final url = Uri.parse(
+      'https://food-api-omega-eight.vercel.app/api/api/public/recipes/$id',
+    );
+
+    try {
+      final response = await http.delete(
+        url,
+        headers: {'Accept': 'application/json'},
+      );
+
+      if (response.statusCode == 200) {
+        setState(() {
+          listResep.removeWhere((r) => r.id == id);
+        });
+
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Resep berhasil dihapus')));
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Gagal hapus (${response.statusCode})')),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Terjadi error')));
     }
   }
 
@@ -129,7 +176,7 @@ class _HomeScreenState extends State<HomeScreen> {
             const SizedBox(height: 8),
             Wrap(
               spacing: 8,
-              children: ['Terbaru', 'terlama']
+              children: ['newest', 'Oldest']
                   .map(
                     (sort) => FilterChip(
                       label: Text(sort),
@@ -154,15 +201,88 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+
+      floatingActionButton: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          if (_showAddOptions) ...[
+            FloatingActionButton.extended(
+              heroTag: 'addCategory',
+              onPressed: () {
+                setState(() {
+                  _showAddOptions = false;
+                });
+
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const AddCategoryForm(),
+                  ),
+                );
+              },
+
+              label: const Text('Tambah Kategori'),
+              icon: const Icon(Icons.category),
+              backgroundColor: const Color.fromARGB(255, 0, 58, 19),
+              foregroundColor: Colors.white,
+            ),
+
+            const SizedBox(height: 10),
+          ],
+
+          if (_showAddOptions) ...[
+            FloatingActionButton.extended(
+              heroTag: 'addRecipe',
+              onPressed: () {
+                setState(() {
+                  _showAddOptions = false;
+                });
+
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const FormResep()),
+                );
+              },
+              label: const Text('Tambah Resep'),
+              icon: const Icon(Icons.restaurant_menu),
+              backgroundColor: const Color.fromARGB(255, 6, 54, 0),
+              foregroundColor: Colors.white,
+            ),
+            const SizedBox(height: 10),
+          ],
+
+          FloatingActionButton(
+            heroTag: 'mainFab',
+            onPressed: () {
+              setState(() {
+                _showAddOptions = !_showAddOptions;
+              });
+            },
+            backgroundColor: const Color(0xFF1B2430),
+            child: Icon(
+              _showAddOptions ? Icons.close : Icons.add,
+
+              color: Colors.white,
+            ),
+          ),
+        ],
+      ),
+
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+
       body: Column(
         children: [
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+
             decoration: BoxDecoration(
               color: Colors.white,
+
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withOpacity(0.3),
+
                   blurRadius: 8,
                   offset: Offset(0, 3),
                 ),
@@ -186,10 +306,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
                     InkWell(
                       borderRadius: BorderRadius.circular(20),
+
                       onTap: () {
                         if (AuthSession.isLoggedIn) {
                           Navigator.push(
                             context,
+
                             MaterialPageRoute(
                               builder: (context) =>
                                   ProfileScreen(user: AuthSession.currentUser!),
@@ -198,6 +320,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         } else {
                           Navigator.push(
                             context,
+
                             MaterialPageRoute(
                               builder: (context) => SignInScreen(),
                             ),
@@ -206,9 +329,11 @@ class _HomeScreenState extends State<HomeScreen> {
                       },
                       child: CircleAvatar(
                         radius: 20,
+
                         backgroundColor: const Color(
                           0xFF1B2430,
                         ).withOpacity(0.1),
+
                         child: const Icon(
                           Icons.person,
                           color: Color(0xFF1B2430),
@@ -249,7 +374,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             });
                           },
                           decoration: InputDecoration(
-                            hintText: 'Cari Resep...',
+                            hintText: 'Cari resep...',
                             border: InputBorder.none,
 
                             prefixIcon: Icon(
@@ -277,6 +402,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ],
                 ),
+                // Active Filter Indicator
                 if (selectedCategory != 'All')
                   Padding(
                     padding: const EdgeInsets.only(top: 12),
@@ -314,11 +440,12 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
 
+          // Main Content
           Expanded(
             child: isLoading
                 ? Center(child: CircularProgressIndicator())
                 : filteredRecipes.isEmpty
-                ? Center(child: Text('No recipes found'))
+                ? Center(child: Text('Belum ada resep'))
                 : GridView.builder(
                     padding: const EdgeInsets.all(12),
                     gridDelegate:
@@ -330,9 +457,10 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                     itemCount: filteredRecipes.length,
                     itemBuilder: (context, index) {
-                      return CardResep(
-                        resep: filteredRecipes[index],
-                        userId: widget.user?.id,
+                      final recipe = filteredRecipes[index];
+                      return CardResepAdmin(
+                        resep: recipe,
+                        onDelete: () => deleteRecipe(recipe.id!),
                       );
                     },
                   ),

@@ -1,7 +1,7 @@
 class ModelAlat {
   final int? id;
   final int? recipeId;
-  final String? name;
+   String? name;
 
   ModelAlat({
     this.id,

@@ -3,17 +3,16 @@ import 'dart:async';
 
 import 'package:fnv/main.dart';
 
-const String _assetImagePath = 'assets/porsche_PNG102847.png';
+const String _assetImagePath = 'assets/image-gen-removebg-preview.png';
 
-class SplashScreen extends StatefulWidget {
-  const SplashScreen({super.key});
+class Intro extends StatefulWidget {
+  const Intro({super.key});
 
   @override
-  State<SplashScreen> createState() => _SplashScreenState();
+  State<Intro> createState() => _IntroState();
 }
 
-class _SplashScreenState extends State<SplashScreen>
-    with SingleTickerProviderStateMixin {
+class _IntroState extends State<Intro> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
 
   late Animation<double> _animation;
@@ -57,12 +56,11 @@ class _SplashScreenState extends State<SplashScreen>
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-
               Image.asset(_assetImagePath, scale: 0.2),
               const SizedBox(height: 16),
 
               const Text(
-                'Recipes',
+                'Onigiri Recipes',
                 style: TextStyle(
                   color: Colors.black,
                   fontSize: 18,
