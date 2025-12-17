@@ -14,6 +14,8 @@ import 'package:fnv/Screens/profile_screen.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:fnv/model/model_user.dart';
+import 'edit_kategori.dart';
+import 'list_kategori.dart';
 
 class AdminHome extends StatefulWidget {
   const AdminHome({super.key});
@@ -225,6 +227,29 @@ class _AdminHomeState extends State<AdminHome> {
 
                 Navigator.push(
                   context,
+                  MaterialPageRoute(builder: (context) => const ListCategory()),
+                );
+              },
+
+              label: const Text('Edit Kategori'),
+              icon: const Icon(Icons.category),
+              backgroundColor: const Color.fromARGB(255, 0, 58, 19),
+              foregroundColor: Colors.white,
+            ),
+
+            const SizedBox(height: 10),
+          ],
+
+          if (_showAddOptions) ...[
+            FloatingActionButton.extended(
+              heroTag: 'addCategory',
+              onPressed: () {
+                setState(() {
+                  _showAddOptions = false;
+                });
+
+                Navigator.push(
+                  context,
                   MaterialPageRoute(
                     builder: (context) => const AddCategoryForm(),
                   ),
@@ -262,7 +287,7 @@ class _AdminHomeState extends State<AdminHome> {
           ],
 
           FloatingActionButton(
-            heroTag: 'mainFab',
+            heroTag: '+',
             onPressed: () {
               setState(() {
                 _showAddOptions = !_showAddOptions;

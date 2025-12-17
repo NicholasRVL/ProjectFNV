@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fnv/model/api_resep_makanan.dart';
 import 'package:fnv/Screens/detail_screen.dart';
-
+import 'edit_resep.dart';
 
 class CardResepAdmin extends StatelessWidget {
   final ModelResep resep;
@@ -86,13 +86,30 @@ class CardResepAdmin extends StatelessWidget {
               ),
             ),
 
-            IconButton(
+            Row(
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.edit),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => FormEditResep(resep: resep),
+                      ),
+                    );
+                  },
+                ),
+                IconButton(
                   icon: const Icon(Icons.delete, color: Color.fromARGB(255, 1, 10, 61)),
                   onPressed: onDelete,
-            ),
+                ),
+              ],
+              
+            )
 
             
-            SizedBox(height: 3),
+
+          
 
           ],
         ),

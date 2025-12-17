@@ -2,20 +2,40 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-const String _categoryApiUrl = 'https://food-api-omega-eight.vercel.app/api/api/categories';
+const String _categoryApiUrl =
+    'https://food-api-omega-eight.vercel.app/api/api/categories';
 
-class AddCategoryForm extends StatefulWidget {
-  const AddCategoryForm({super.key});
+class EditCategoryForm extends StatefulWidget {
+  final int categoryId;
+  final String name;
+  final String? description;
+
+  const EditCategoryForm({
+    super.key,
+    required this.categoryId,
+    required this.name,
+    this.description,
+  });
 
   @override
-  State<AddCategoryForm> createState() => _AddCategoryFormState();
+  State<EditCategoryForm> createState() => _EditCategoryFormState();
 }
 
-class _AddCategoryFormState extends State<AddCategoryForm> {
+class _EditCategoryFormState extends State<EditCategoryForm> {
   final _formKey = GlobalKey<FormState>();
+
   final TextEditingController _categoryNameController = TextEditingController();
   final TextEditingController _categoryDescriptionController =
       TextEditingController();
+
+  bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _categoryNameController.text = widget.name;
+    _categoryDescriptionController.text = widget.description ?? '';
+  }
 
   String _toSlug(String text) {
     return text
@@ -24,23 +44,22 @@ class _AddCategoryFormState extends State<AddCategoryForm> {
         .replaceAll(RegExp(r'^-|-$'), '');
   }
 
-  bool _isLoading = false;
-
-  Future<void> _submitCategory() async {
+  Future<void> _submitEditCategory() async {
     if (!_formKey.currentState!.validate()) return;
 
     setState(() => _isLoading = true);
+
     final name = _categoryNameController.text.trim();
 
     final payload = {
-      'name': _categoryNameController.text,
+      'name': name,
       'slug': _toSlug(name),
       'description': _categoryDescriptionController.text,
     };
 
     try {
-      final response = await http.post(
-        Uri.parse(_categoryApiUrl),
+      final response = await http.put(
+        Uri.parse('$_categoryApiUrl/${widget.categoryId}'),
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
@@ -50,11 +69,11 @@ class _AddCategoryFormState extends State<AddCategoryForm> {
 
       if (response.statusCode >= 200 && response.statusCode < 300) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Kategori ditambahkan')),
+          const SnackBar(content: Text('Kategori berhasil diupdate')),
         );
         Navigator.pop(context, true);
       } else {
-        String message = 'Gagal menyimpan kategori (${response.statusCode})';
+        String message = 'Gagal update kategori (${response.statusCode})';
         try {
           final err = jsonDecode(response.body);
           if (err['message'] != null) {
@@ -64,7 +83,7 @@ class _AddCategoryFormState extends State<AddCategoryForm> {
 
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('$message')));
+        ).showSnackBar(SnackBar(content: Text(message)));
       }
     } catch (e) {
       ScaffoldMessenger.of(
@@ -85,7 +104,7 @@ class _AddCategoryFormState extends State<AddCategoryForm> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[100],
+      backgroundColor: const Color.fromARGB(255, 255, 255, 255),
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
@@ -101,7 +120,6 @@ class _AddCategoryFormState extends State<AddCategoryForm> {
         ),
         backgroundColor: Colors.white,
         elevation: 0,
-        centerTitle: false,
       ),
       body: SingleChildScrollView(
         child: Center(
@@ -126,7 +144,7 @@ class _AddCategoryFormState extends State<AddCategoryForm> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text(
-                    'Tambah kategori',
+                    'Edit kategori',
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.w600,
@@ -139,34 +157,7 @@ class _AddCategoryFormState extends State<AddCategoryForm> {
                   TextFormField(
                     controller: _categoryNameController,
                     style: const TextStyle(fontSize: 14),
-                    decoration: InputDecoration(
-                      hintText: 'nama',
-                      hintStyle: TextStyle(
-                        color: Colors.grey[400],
-                        fontSize: 14,
-                      ),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(4),
-                        borderSide: BorderSide(color: Colors.grey[400]!),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(4),
-                        borderSide: BorderSide(color: Colors.grey[400]!),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(4),
-                        borderSide: BorderSide(
-                          color: Colors.grey[700]!,
-                          width: 1.5,
-                        ),
-                      ),
-                      filled: true,
-                      fillColor: Colors.white,
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 14,
-                      ),
-                    ),
+                    decoration: _inputDecoration('nama'),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'butuh category';
@@ -182,36 +173,9 @@ class _AddCategoryFormState extends State<AddCategoryForm> {
                   _buildLabel('Description (Optional)'),
                   TextFormField(
                     controller: _categoryDescriptionController,
-                    style: const TextStyle(fontSize: 14),
                     maxLines: 4,
-                    decoration: InputDecoration(
-                      hintText: '',
-                      hintStyle: TextStyle(
-                        color: Colors.grey[400],
-                        fontSize: 14,
-                      ),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(4),
-                        borderSide: BorderSide(color: Colors.grey[400]!),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(4),
-                        borderSide: BorderSide(color: Colors.grey[400]!),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(4),
-                        borderSide: BorderSide(
-                          color: Colors.grey[700]!,
-                          width: 1.5,
-                        ),
-                      ),
-                      filled: true,
-                      fillColor: Colors.white,
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 14,
-                      ),
-                    ),
+                    style: const TextStyle(fontSize: 14),
+                    decoration: _inputDecoration(''),
                   ),
                   const SizedBox(height: 32),
 
@@ -241,7 +205,7 @@ class _AddCategoryFormState extends State<AddCategoryForm> {
                       const SizedBox(width: 12),
                       Expanded(
                         child: ElevatedButton(
-                          onPressed: _isLoading ? null : _submitCategory,
+                          onPressed: _isLoading ? null : _submitEditCategory,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.black87,
                             padding: const EdgeInsets.symmetric(vertical: 14),
@@ -259,7 +223,7 @@ class _AddCategoryFormState extends State<AddCategoryForm> {
                                   ),
                                 )
                               : const Text(
-                                  'Simpan',
+                                  'Update',
                                   style: TextStyle(
                                     color: Colors.white,
                                     fontSize: 15,
@@ -275,6 +239,28 @@ class _AddCategoryFormState extends State<AddCategoryForm> {
           ),
         ),
       ),
+    );
+  }
+
+  InputDecoration _inputDecoration(String hint) {
+    return InputDecoration(
+      hintText: hint,
+      hintStyle: TextStyle(color: Colors.grey[400], fontSize: 14),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(4),
+        borderSide: BorderSide(color: Colors.grey[400]!),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(4),
+        borderSide: BorderSide(color: Colors.grey[400]!),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(4),
+        borderSide: BorderSide(color: Colors.grey[700]!, width: 1.5),
+      ),
+      filled: true,
+      fillColor: Colors.white,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
     );
   }
 
