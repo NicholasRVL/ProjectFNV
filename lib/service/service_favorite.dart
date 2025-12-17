@@ -18,7 +18,7 @@ class FavoriteService {
 
       return data.map((e) => ModelResep.fromJson(e)).toList();
     } else {
-      throw Exception('Gagal ambil resep favorit 😤');
+      throw Exception('Gagal ambil resep favorit');
     }
   }
 }

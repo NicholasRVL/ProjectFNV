@@ -45,7 +45,7 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
           if (favorites.isEmpty) {
             return const Center(
               child: Text(
-                'Belum ada resep disimpna',
+                'Belum ada resep disimpan',
                 style: TextStyle(fontSize: 16),
               ),
             );

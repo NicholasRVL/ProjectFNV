@@ -48,6 +48,15 @@ class _AdminHomeState extends State<AdminHome> {
         setState(() {
           listResep = data.map((e) => ModelResep.fromJson(e)).toList();
 
+          final apiCategories = listResep
+              .map((e) => e.category?.name)
+              .where((name) => name != null)
+              .cast<String>()
+              .toSet()
+              .toList();
+
+          categories = ['All', ...apiCategories];
+
           isLoading = false;
         });
       } else {
@@ -176,7 +185,7 @@ class _AdminHomeState extends State<AdminHome> {
             const SizedBox(height: 8),
             Wrap(
               spacing: 8,
-              children: ['newest', 'Oldest']
+              children: ['Terbaru', 'terlama']
                   .map(
                     (sort) => FilterChip(
                       label: Text(sort),
@@ -294,7 +303,6 @@ class _AdminHomeState extends State<AdminHome> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-
                     Text(
                       'Onigiri',
                       style: const TextStyle(
